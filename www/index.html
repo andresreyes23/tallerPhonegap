@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+
+    <title>Taller PhoneGap</title>
+</head>
+
+<body>
+    <div class="app">
+        <div class="container">
+            <div class="row">
+                   
+                <div class="col-auto"><input class="form-control" id="myInput" type="text" placeholder="Search.."></div>
+                <div class="btn-group">
+                        
+                        <button type="button" onclick="javascript:mostrarContactos();" class="btn btn-success">contactos</button>
+                        <button type="button" class="btn btn-danger">conectados</button>
+                        <button type="button" onclick="javascript:checkConnection();" class="btn btn-warning">navergar</button>
+                        <button type="button" class="btn btn-info">servico</button>
+                </div>
+                <br>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        <tr>
+                            <td>Alvaro</td>
+                            <td>Gay</td>
+                        </tr>
+                        <tr>
+                            <td>jorge</td>
+                            <td>torres</td>
+                        </tr>
+                        <tr>
+                            <td>July</td>
+                            <td>Dooley</td>
+                        </tr>
+                        <tr>
+                            <td>aaa</td>
+                            <td>Ravendale</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        app.initialize();
+        $(document).ready(function () {
+            $("#myInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#myTable tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
+        function mostrarContactos() {
+            var options = new ContactFindOptions();
+            options.filter = "alvaro";
+            options.multiple = true;
+            options.desiredFields = [navigator.contacts.fieldType.id];
+            options.hasPhoneNumber = true;
+            var fields = [navigator.contacts.fieldType.displayName, navigator.contacts.fieldType.name];
+            //BUSCAR CONTACTOS
+            navigator.contacts.find(fields, onSuccess, onError, options);
+        }
+        function onSuccess(contacts) {
+            alert(contacts.length);
+            console.log(contacts.length);
+            var table = document.getElementById("tableContactos");
+            for (var i = 0; i <= contacts.length; i++) {
+                var row = table.insertRow(0);
+                var cell1 = table.insertCell(0);
+                var cell2 = table.insertCell(1);
+                cell1.innerHTML = contacts[i].displayName;
+                cell2.innerHTML = contacts[i].phoneNumbers[0];
+            }
+        }
+        function onError() {
+            alert('error con los contactos');
+        }
+        function checkConnection() {
+            var networkState = navigator.connection.type;
+
+            var states = {};
+            states[Connection.UNKNOWN] = 'Unknown connection';
+            states[Connection.ETHERNET] = 'Ethernet connection';
+            states[Connection.WIFI] = 'WiFi connection';
+            states[Connection.CELL_2G] = 'Cell 2G connection';
+            states[Connection.CELL_3G] = 'Cell 3G connection';
+            states[Connection.CELL_4G] = 'Cell 4G connection';
+            states[Connection.CELL] = 'Cell generic connection';
+            states[Connection.NONE] = 'No network connection';
+
+            alert('Connection type: ' + states[networkState]);
+        }
+    </script>
+</body>
+
+</html>
